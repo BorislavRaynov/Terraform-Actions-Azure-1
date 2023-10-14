@@ -17,12 +17,12 @@ resource "random_integer" "ri" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.resource_group_name}${random_integer.ri.result}"
+  name     = var.resource_group_name
   location = var.resource_group_location
 }
 
 resource "azurerm_mssql_server" "sqls" {
-  name                         = "${var.sql_server_name}${random_integer.ri.result}"
+  name                         = var.sql_server_name
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = azurerm_resource_group.rg.location
   version                      = "12.0"
@@ -31,7 +31,7 @@ resource "azurerm_mssql_server" "sqls" {
 }
 
 resource "azurerm_mssql_database" "sqldb" {
-  name           = "${var.sql_database_name}${random_integer.ri.result}"
+  name           = var.sql_database_name
   server_id      = azurerm_mssql_server.sqls.id
   collation      = "SQL_Latin1_General_CP1_CI_AS"
   license_type   = "LicenseIncluded"
@@ -40,14 +40,14 @@ resource "azurerm_mssql_database" "sqldb" {
 }
 
 resource "azurerm_mssql_firewall_rule" "sqldbfw" {
-  name             = "${var.firewall_rule_name}${random_integer.ri.result}"
+  name             = var.firewall_rule_name
   server_id        = azurerm_mssql_server.sqls.id
   start_ip_address = "0.0.0.0"
   end_ip_address   = "0.0.0.0"
 }
 
 resource "azurerm_service_plan" "asp" {
-  name                = "${var.app_service_plan_name}${random_integer.ri.result}"
+  name                = var.app_service_plan_name
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   os_type             = "Linux"
@@ -55,7 +55,7 @@ resource "azurerm_service_plan" "asp" {
 }
 
 resource "azurerm_linux_web_app" "alwa" {
-  name                = "${var.app_service_name}${random_integer.ri.result}"
+  name                = var.app_service_name
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_service_plan.asp.location
   service_plan_id     = azurerm_service_plan.asp.id
